@@ -427,8 +427,7 @@ items.
 
 ### Sumit Prajapati
 
-Computer Engineering Student \| Full-Stack Developer \| Aspiring AI
-Engineer
+Computer Engineering Student 
 
 GitHub:\
 https://github.com/SumitPrajapati03
