@@ -1,295 +1,446 @@
-<div align="center">
-
+::: {align="center"}
 # 🚀 TaskPilot AI
 
-### An AI-Powered Project Manager Assistant
+### AI-Powered Project Manager Assistant
 
-**Turns unstructured meeting notes and documents into clean, structured, actionable tasks — automatically.**
+Turn unstructured meeting notes and documents into **clean, structured,
+actionable tasks** with AI.
 
-[![Python](https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
-[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-Frontend-646CFF?style=for-the-badge&logo=vite)](https://vitejs.dev/)
-[![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite)](https://www.sqlite.org/)
-[![AWS](https://img.shields.io/badge/AWS-EC2-FF9900?style=for-the-badge&logo=amazonaws)](https://aws.amazon.com/)
-[![Vercel](https://img.shields.io/badge/Vercel-Deployed-black?style=for-the-badge&logo=vercel)](https://vercel.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](#license)
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev/)
+[![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![Tailwind
+CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](#license)
+:::
 
-**[Live Demo (AWS)](#) · [Backup Demo (Vercel)](#) · [Architecture](#-architecture) · [API Reference](#-api-reference)**
+------------------------------------------------------------------------
 
-</div>
+## 📌 Overview
 
----
+**TaskPilot AI** is a full-stack AI-powered project management assistant
+that converts meeting notes, documents, and unstructured text into
+useful, structured tasks.
 
-## 💡 Why This Project Exists
+Instead of manually reading meeting notes and creating tasks one by one,
+TaskPilot processes the input through an AI pipeline and generates tasks
+containing information such as:
 
-Every project manager has lived this problem: a 45-minute meeting produces five minutes of actual decisions buried in forty minutes of discussion, status updates, and tangents. Someone still has to comb through it and turn "we should probably look into that" into a task with an owner, a deadline, and a priority.
+-   📝 Task title
+-   👤 Owner
+-   📅 Deadline
+-   🔥 Priority
+-   📊 Status
 
-**TaskPilot AI automates that translation** — not with a single naive prompt that treats every sentence as a task, but with a deliberately engineered, multi-stage AI pipeline built the way a production AI system should be: modular, explainable, deterministic where it matters, and resilient when a provider goes down.
+Users can then review, edit, filter, delete, and export their tasks.
 
-This isn't a weekend hackathon wrapper around an API call. It's a demonstration of how I think about **shipping AI features as real software** — with the architecture discipline, failure handling, and observability that a production team would expect.
-
----
-
-## 🎯 What This Project Demonstrates
-
-| Skill Area | How It Shows Up Here |
-|---|---|
-| **Prompt Engineering** | A two-stage LLM pipeline that separates *reasoning* (is this actually a task?) from *structuring* (turn it into clean JSON) — because asking one prompt to do both produces worse, less consistent results |
-| **AI Systems Reliability** | Automatic 3-provider fallback (Groq → Gemini → Ollama), retry-on-validation-failure logic, and a deterministic Python cleanup layer that catches what the LLM misses |
-| **Backend Architecture** | Strict Repository + Service Layer separation, async FastAPI throughout, zero business logic leaking into routes |
-| **Production Thinking** | SHA-256 deduplication to avoid re-billing an LLM for content already processed, real-time SSE progress streaming, environment-driven config, and a live deployment on AWS with Nginx + systemd |
-| **Debugging Discipline** | Every non-trivial bug in this project was resolved through evidence-first, traceback-driven root cause analysis — not speculative patching (see [Engineering Highlights](#-engineering-highlights)) |
-| **Full-Stack Delivery** | A complete, working product from raw text input to an editable, filterable, exportable task dashboard — deployed and reachable by anyone, not just running on localhost |
-
-If you're evaluating this for an AI Engineering internship, the code is intentionally written so every design decision can be explained and defended in an interview — nothing here is a black box, including to me.
-
----
-
-## 📖 Overview
-
-Paste meeting notes or upload a `.txt`, `.pdf`, or `.docx` file. TaskPilot AI extracts genuine action items, infers who owns them, when they're due, and how urgent they are — then hands you back a structured, editable task list you can filter, update, and export as JSON.
-
----
+------------------------------------------------------------------------
 
 ## ✨ Features
 
-**AI Task Generation**
-- Paste raw text or upload TXT / PDF / DOCX
-- Automatic owner extraction
-- Automatic deadline inference
-- Automatic priority assignment (High / Medium / Low)
+### 🤖 AI Task Generation
 
-**Intelligent Multi-Stage AI Pipeline**
-- Stage 1 — Action Item Detection *(filters out agenda chatter, status updates, and decisions with no owner)*
-- Stage 2 — Structured Task Extraction *(converts confirmed action items into clean JSON)*
-- Deterministic Python Cleanup *(deduplicates titles, normalizes fields, catches anything the LLM missed)*
-- Pydantic Validation *(nothing malformed ever reaches the database)*
+-   Paste meeting notes directly into the application
+-   Upload `.txt`, `.pdf`, or `.docx` files
+-   Automatically detect action items
+-   Extract task owners
+-   Infer deadlines
+-   Assign task priorities
 
-**Real-Time Progress Tracking**
-Live Server-Sent Events stream every processing stage to the UI as it happens — no spinner, no black box:
+### 🧠 Multi-Stage AI Pipeline
 
-`Reading File → Extracting Text → Detecting Action Items → Creating Prompt → Calling Provider → Waiting for Response → Parsing JSON → Validating Output → Cleaning Tasks → Saving Tasks → Completed`
-
-**Smart Deduplication**
-Every submission is normalized and hashed (SHA-256). Resubmitting the same meeting notes skips the LLM call entirely — faster, cheaper, and fully deterministic, verified to survive full server restarts.
-
-**Task Management**
-View, edit, delete, and filter tasks by owner/priority/status. Export the full task list as clean JSON with one click.
-
----
-
-## 🏗 Architecture
-<img width="1376" height="2192" alt="diagram-export-7-7-2026-4_25_15-PM" src="https://github.com/user-attachments/assets/b0a40e96-02ff-4946-a0c6-3f84cf26c251" />
-
-
-### AI Processing Pipeline
-
-```
-Meeting Notes / Uploaded File
-            │
-            ▼
-      Text Extraction
-            │
-            ▼
-  Action Item Detection  ◄── LLM Call #1 (filters signal from noise)
-            │
-            ▼
-Structured Task Extraction  ◄── LLM Call #2 (clean JSON only)
-            │
-            ▼
-   Python Cleanup Layer   ◄── deterministic, no LLM, fully unit-testable
-            │
-            ▼
+``` text
+Meeting Notes / Document
+          ↓
+     Text Extraction
+          ↓
+ Action Item Detection
+          ↓
+ Structured Task Extraction
+          ↓
+   Python Cleanup Layer
+          ↓
    Pydantic Validation
-            │
-            ▼
-    Repository Layer
-            │
-            ▼
-     SQLite Database
+          ↓
+    SQLite Database
+          ↓
+      Task Dashboard
 ```
 
-**Why two LLM calls instead of one?** A single prompt asked to simultaneously understand intent, filter noise, extract structure, infer owners, and infer dates produces inconsistent results — the same meeting notes would occasionally get generate different priorities or invent tasks that were never actually agenda items. Splitting the reasoning from the structuring gave each call one job, and it visibly cleaned up extraction quality in testing.
+The multi-stage approach separates **understanding** from
+**structuring**, helping produce cleaner and more reliable task data.
 
-### Backend Layered Architecture
+### 🔄 Multiple AI Providers
 
-```
-API Routes → Service Layer → Repository Layer → SQLite Database
-```
+TaskPilot supports multiple AI providers:
 
-```
-backend/
-└── app/
-    ├── api/          # Thin route handlers — no business logic
-    ├── core/         # Config, logging
-    ├── database/     # Session & engine setup
-    ├── models/       # SQLAlchemy ORM models
-    ├── providers/    # Groq / Gemini / Ollama — one shared interface
-    ├── repository/   # All DB CRUD, nothing else
-    ├── schemas/      # Pydantic request/response contracts
-    ├── services/     # Orchestration: prompts → LLM → validation → repository
-    └── utils/        # Text extraction, JSON parsing, deterministic cleanup
+``` text
+Groq
+  ↓
+Gemini
+  ↓
+Ollama
 ```
 
-### LLM Provider Strategy
+If one provider is unavailable, the application can fall back to another
+configured provider.
 
-```
-Groq → Gemini → Ollama
-```
+### 📡 Real-Time Processing
 
-If Groq fails or times out, the system automatically falls back to Gemini, then Ollama — the service layer never knows or cares which provider actually generated the response. Every provider implements the exact same `generate(prompt) -> str` interface, making providers fully swappable.
+TaskPilot uses **Server-Sent Events (SSE)** to show processing progress
+in real time.
 
-### Real-Time Event Flow
-
-```
-User → POST /generate → Background AI Processing → Progress Emitter
-     → GET /progress/{job_id} (SSE) → React Processing Timeline
-     → Completed → GET /tasks → Task Table
-```
-
-### Frontend Structure
-
-```
-React
-├── Navbar
-├── Input Section / Upload Area / Generate Button
-├── Processing Timeline      (live SSE-driven)
-├── Summary Cards
-├── Filter Bar
-├── Task Table / Task Edit Modal
-└── JSON Viewer (copy / download)
+``` text
+Reading File
+     ↓
+Extracting Text
+     ↓
+Detecting Action Items
+     ↓
+Calling AI Provider
+     ↓
+Parsing Response
+     ↓
+Validating Tasks
+     ↓
+Saving Tasks
+     ↓
+Completed
 ```
 
-State is managed through two custom hooks — `useTaskGeneration()` for the generation + SSE lifecycle, and `useTasks()` for all CRUD + filtering — keeping every UI component purely presentational.
+### 🗂 Task Management
 
----
+-   View tasks
+-   Edit tasks
+-   Delete tasks
+-   Filter tasks
+-   Filter by owner
+-   Filter by priority
+-   Filter by status
+-   Export tasks as JSON
 
-## 🛠 Tech Stack
+### ♻️ Smart Deduplication
 
-| Layer | Technology |
-|---|---|
-| **Frontend** | React 19, Vite, Tailwind CSS, Axios, native EventSource (SSE) |
-| **Backend** | FastAPI, SQLAlchemy (async), Pydantic, AsyncIO, SQLite |
-| **AI Providers** | Groq, Gemini, Ollama *(direct API integration — no LangChain/LlamaIndex/CrewAI)* |
-| **Deployment** | AWS EC2, Nginx, systemd, Vercel |
+Submitted content can be normalized and hashed using SHA-256 to avoid
+unnecessarily processing identical input multiple times.
 
-**Why no LangChain/agent frameworks?** Direct provider integration keeps every request/response fully transparent and easy to reason about — there's no framework abstraction between "what I sent the model" and "what came back." For a system this focused, that transparency is worth more than the convenience.
+------------------------------------------------------------------------
 
----
+## 🛠️ Tech Stack
 
-## 📡 API Reference
+  Layer             Technology
+  ----------------- -------------------------------------
+  Frontend          React 19, Vite, Tailwind CSS, Axios
+  Backend           FastAPI, Uvicorn, Python
+  Database          SQLite, SQLAlchemy, aiosqlite
+  Validation        Pydantic
+  AI                Groq, Google Gemini, Ollama
+  File Processing   pypdf, python-docx
+  Communication     REST API + SSE
+  Configuration     python-dotenv, pydantic-settings
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/generate` | Submit text or a file, kick off the AI pipeline |
-| `GET` | `/progress/{job_id}` | Live SSE stream of processing stages |
-| `GET` | `/tasks` | Fetch all tasks (supports owner/priority/status filters) |
-| `PUT` | `/tasks/{id}` | Update a task |
-| `DELETE` | `/tasks/{id}` | Delete a task |
-| `GET` | `/tasks/export/json` | Download all tasks as `tasks.json` |
-| `GET` | `/health` | Health check |
+------------------------------------------------------------------------
 
----
+## 📁 Project Structure
 
-## 📂 Supported Inputs
+``` text
+TaskPilot AI/
+│
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   │   └── routes/
+│   │   ├── core/
+│   │   ├── database/
+│   │   ├── models/
+│   │   ├── providers/
+│   │   ├── repository/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   ├── prompts/
+│   │   ├── utils/
+│   │   └── main.py
+│   │
+│   ├── .env.example
+│   └── requirements.txt
+│
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── api/
+│   │   ├── assets/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   │
+│   ├── package.json
+│   └── vite.config.js
+│
+├── docs/
+├── .gitignore
+└── README.md
+```
 
-| Type | Supported |
-|---|:---:|
-| Pasted plain text | ✅ |
-| `.txt` | ✅ |
-| `.pdf` | ✅ |
-| `.docx` | ✅ |
-
----
+------------------------------------------------------------------------
 
 ## 🚀 Getting Started
 
-### Backend
-```bash
+### Prerequisites
+
+Install:
+
+-   Python 3.11+
+-   Node.js
+-   npm
+-   Git
+-   An API key for Groq or Gemini if you want to use those providers
+-   Ollama if you want to use a local AI provider
+
+### 1. Clone the repository
+
+``` bash
+git clone https://github.com/SumitPrajapati03/taskpilot.git
+cd taskpilot
+```
+
+### 2. Setup Backend
+
+``` bash
 cd backend
 python -m venv .venv
-source .venv/bin/activate      # Windows: .venv\Scripts\activate
+```
+
+#### Windows
+
+``` powershell
+.venv\Scripts\Activate.ps1
+```
+
+#### macOS / Linux
+
+``` bash
+source .venv/bin/activate
+```
+
+Install dependencies:
+
+``` bash
 pip install -r requirements.txt
+```
+
+### 3. Configure Environment Variables
+
+Create:
+
+``` text
+backend/.env
+```
+
+Add:
+
+``` env
+GROQ_API_KEY=your_groq_api_key
+GEMINI_API_KEY=your_gemini_api_key
+OLLAMA_BASE_URL=http://localhost:11434
+
+DATABASE_URL=sqlite+aiosqlite:///./taskpilot.db
+
+ENV=development
+```
+
+You can use `backend/.env.example` as a reference.
+
+> ⚠️ Never upload your real API keys to GitHub.
+
+### 4. Start Backend
+
+From the `backend` folder:
+
+``` bash
 uvicorn app.main:app --reload
 ```
 
-### Frontend
-```bash
+Backend:
+
+``` text
+http://127.0.0.1:8000
+```
+
+FastAPI documentation:
+
+``` text
+http://127.0.0.1:8000/docs
+```
+
+### 5. Start Frontend
+
+Open another terminal:
+
+``` bash
 cd frontend
 npm install
 npm run dev
 ```
 
-### Environment Variables
+Vite will provide the frontend URL, normally:
 
-**Backend (`.env`)**
-```env
-DATABASE_URL=
-GROQ_API_KEY=
-GROQ_MODEL=
-GEMINI_API_KEY=
-GEMINI_MODEL=
-OLLAMA_BASE_URL=
-OLLAMA_MODEL=
+``` text
+http://localhost:5173
 ```
 
-**Frontend (`.env`)**
-```env
-VITE_API_URL=
+------------------------------------------------------------------------
+
+## 🔐 Environment Variables
+
+  Variable            Purpose
+  ------------------- ----------------------------------
+  `GROQ_API_KEY`      Groq API authentication
+  `GEMINI_API_KEY`    Google Gemini API authentication
+  `OLLAMA_BASE_URL`   Local Ollama server URL
+  `DATABASE_URL`      SQLite database connection
+  `ENV`               Application environment
+
+------------------------------------------------------------------------
+
+## 📡 API Endpoints
+
+  Method     Endpoint               Description
+  ---------- ---------------------- ----------------------------
+  `GET`      `/health`              Check API status
+  `POST`     `/generate`            Generate tasks from input
+  `GET`      `/progress/{job_id}`   Stream processing progress
+  `GET`      `/tasks`               Retrieve tasks
+  `PUT`      `/tasks/{task_id}`     Update a task
+  `DELETE`   `/tasks/{task_id}`     Delete a task
+  `GET`      `/tasks/export/json`   Export tasks as JSON
+
+For complete request and response schemas, open the FastAPI Swagger UI
+at `/docs`.
+
+------------------------------------------------------------------------
+
+## 🧩 How It Works
+
+### Step 1 --- Input
+
+The user enters meeting notes or uploads a document.
+
+### Step 2 --- Text Extraction
+
+The backend extracts text from the uploaded file.
+
+### Step 3 --- AI Processing
+
+The AI identifies meaningful action items.
+
+### Step 4 --- Task Creation
+
+The action items are converted into structured task information.
+
+### Step 5 --- Validation
+
+Pydantic validates the generated data.
+
+### Step 6 --- Database
+
+Valid tasks are stored in SQLite.
+
+### Step 7 --- Dashboard
+
+The React frontend displays the generated tasks.
+
+``` text
+User
+ │
+ ▼
+React Frontend
+ │
+ ▼
+FastAPI Backend
+ │
+ ▼
+Text Extraction
+ │
+ ▼
+AI Providers
+ │
+ ▼
+Task Processing
+ │
+ ▼
+Validation
+ │
+ ▼
+SQLite
+ │
+ ▼
+Task Dashboard
 ```
 
----
+------------------------------------------------------------------------
 
-## ☁️ Production Deployment
+## 🎯 Why TaskPilot?
 
-**Primary — AWS EC2:** Ubuntu instance running the FastAPI backend under systemd (auto-restart on crash/reboot), Nginx as a reverse proxy handling both the static React build and API routing — with dedicated SSE-safe proxy configuration (buffering disabled) so live progress streaming isn't broken by the proxy layer.
+Meeting discussions often contain important tasks hidden inside long
+conversations.
 
-**Backup — Vercel:** The same frontend build, deployed statically and pointed at the same live AWS backend, as a redundant access point.
+For example:
 
-Full setup is documented in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+> "We should probably update the landing page before the next release."
 
----
+TaskPilot can transform this type of statement into a structured task:
 
-## 📈 Engineering Highlights
+``` json
+{
+  "title": "Update the landing page",
+  "priority": "Medium",
+  "status": "Pending"
+}
+```
 
-A few things worth knowing about how this project was actually built, beyond the feature list:
+This reduces manual work and helps teams avoid missing important action
+items.
 
-- **Debugged with evidence, not guesses.** Every non-trivial bug during development — including a subtle deduplication issue and a stale-process false alarm — was root-caused through captured tracebacks and controlled before/after verification, never through speculative "let's try this" patches.
-- **Deduplication is verified to survive a full process restart**, proving the hash-check is backed by persisted database state rather than in-memory caching.
-- **The cleanup layer is intentionally deterministic and LLM-free** — duplicate detection, field normalization, and priority validation don't depend on model behavior, so they're fast, free, and fully testable in isolation.
-- **SSE was chosen deliberately over WebSockets** — the use case (streaming discrete pipeline stages, not bidirectional chat) doesn't need WebSocket's complexity, and SSE is simpler to reason about and debug.
+------------------------------------------------------------------------
 
----
+## 🔮 Future Improvements
 
-## 🔮 Roadmap
+-   [ ] User authentication
+-   [ ] Multi-user workspaces
+-   [ ] PostgreSQL support
+-   [ ] Redis background jobs
+-   [ ] Docker / Docker Compose
+-   [ ] Calendar integration
+-   [ ] Jira integration
+-   [ ] Trello integration
+-   [ ] Team collaboration
+-   [ ] Automated testing
+-   [ ] CI/CD pipeline
+-   [ ] Production monitoring
 
-- PostgreSQL for production-scale storage
-- User authentication & multi-user workspaces
-- Team collaboration & calendar integration
-- Redis-backed background job queue
-- Docker Compose for one-command local setup
-- CI/CD pipeline
-- Kubernetes deployment for horizontal scaling
+------------------------------------------------------------------------
 
----
+## 👨‍💻 Author
 
-## 👨‍💻 About the Author
+### Sumit Prajapati
 
-**Shreyansh Pipaliya**
-Computer Engineering Undergraduate · Full-Stack Developer · Aspiring AI Engineer
+Computer Engineering Student \| Full-Stack Developer \| Aspiring AI
+Engineer
 
-I built this project to demonstrate not just that I can call an LLM API, but that I can **design the system around it properly** — with the reliability, observability, and architectural discipline that separates a working demo from something a team could actually maintain in production. I'd welcome the chance to talk through any part of this design in more depth.
+GitHub:\
+https://github.com/SumitPrajapati03
 
-[GitHub](https://github.com/shreyyansh10) · [LinkedIn](https://linkedin.com/shreyansh-pipaliya)
-
----
+------------------------------------------------------------------------
 
 ## 📄 License
 
-Licensed under the [MIT License](LICENSE).
+This project is licensed under the **MIT License**.
 
+------------------------------------------------------------------------
 
-
-### ⭐ If this project reflects the kind of engineer you're looking for, let's talk.
-
+::: {align="center"}
+### ⭐ If you like this project, consider giving it a star!
+:::
